@@ -60,6 +60,12 @@ const Card = (props) => {
     const WrapData = useSelector((state) => state.category.WrapsData);
     console.log('WrapData ..',WrapData)
 
+    const BurgerData = useSelector((state) => state.category.BurgersData);
+    //console.log('WrapData ..',WrapData)
+
+    const DrinkData = useSelector((state) => state.category.DrinksData);
+    //console.log('WrapData ..',WrapData)
+
     const [loading, setLoading] = useState(true);
 
 
@@ -87,7 +93,7 @@ const Card = (props) => {
 
     useEffect(()=>{
         const fetchWraps = async() => {
-            setWrapsData.length=0
+            dispatch(setWrapsData)
             try {
             //Read all data from Firebase
                 await getDocs(collection(db,"/Categories/QXMtKSSMbmfgyyZhHSmw/items")).then(docSnap=>{
@@ -107,68 +113,59 @@ const Card = (props) => {
                 fetchWraps();
     },[categoryType])
 
-    // useEffect(()=>{
-    //     const fetchBurgers = async() => {
-    //         //dispatch(setCategoryData([]))
-    //         try {
-    //         //Read all data from Firebase
-    //             await getDocs(collection(db,"/Categories/VUaZyg1XOAsbKQShBv2b/items")).then(docSnap=>{
-    //                     let categories = []; 
-    //                     docSnap.forEach((doc)=>{
-    //                         burgerData.push({...doc.data(),id:doc.id})
-    //                         //dispatch(setCategoryData(burgerData))
-    //                     });
-    //                     console.log('Document Data', burgerData);
-    //                     setBurgerData(burgerData)
-    //                     setLoading(false);
-    //                 });
-    //                 } catch(err) {
-    //                     console.error(err);
-    //                 }
-    //             };
-    //         fetchBurgers()
-    // },[categoryType])
+    useEffect(()=>{
+        const fetchBurgers = async() => {
+            dispatch(setBurgersData)
+            try {
+            //Read all data from Firebase
+                await getDocs(collection(db,"/Categories/VUaZyg1XOAsbKQShBv2b/items")).then(docSnap=>{
+                        let categories = []; 
+                        docSnap.forEach((doc)=>{
+                            //burgerData.push({...doc.data(),id:doc.id})
+                            dispatch(setBurgersData({...doc.data(),id:doc.id}))
+                        });
+                        //console.log('Document Data', burgerData);
+                        //setBurgerData(burgerData)
+                        setLoading(false);
+                    });
+                    } catch(err) {
+                        console.error(err);
+                    }
+                };
+            fetchBurgers()
+    },[categoryType])
 
-    // useEffect(()=>{
-    //     const fetchDrinks = async() => {
-    //         //dispatch(setCategoryData([]))
-    //         try {
-    //         //Read all data from Firebase
-    //             await getDocs(collection(db,"/Categories/zBKK4Ii1XyKOQqKGxjcF/items")).then(docSnap=>{
-    //                     let categories = []; 
-    //                     docSnap.forEach((doc)=>{
-    //                         drinkData.push({...doc.data(),id:doc.id})
-    //                         //dispatch(setCategoryData(drinkData))
-    //                     });
-    //                     console.log('Document Data', drinkData);
-    //                     setDrinkData(drinkData)
-    //                     setLoading(false);
-    //                 });
-    //                 } catch(err) {
-    //                     console.error(err);
-    //                 }
-    //             };
-    //             fetchDrinks();
-    // },[categoryType])
+    useEffect(()=>{
+        const fetchDrinks = async() => {
+            dispatch(setDrinkData)
+            try {
+            //Read all data from Firebase
+                await getDocs(collection(db,"/Categories/zBKK4Ii1XyKOQqKGxjcF/items")).then(docSnap=>{
+                        let categories = []; 
+                        docSnap.forEach((doc)=>{
+                            //drinkData.push({...doc.data(),id:doc.id})
+                            dispatch(setDrinkData({...doc.data(),id:doc.id}))
+                        });
+                        // console.log('Document Data', drinkData);
+                        // setDrinkData(drinkData)
+                        setLoading(false);
+                    });
+                    } catch(err) {
+                        console.error(err);
+                    }
+                };
+                fetchDrinks();
+    },[categoryType])
 
     return (
         !loading &&
         <View>
-            {categoryType==='Desserts'?
             <FlatList
-            data={categoryData}
+            data={categoryType==='Desserts'?categoryData:categoryType==='Wraps'?WrapData:categoryType==='Burgers'?BurgerData:DrinkData}
             renderItem={({item}) => <Item image={item.image} title={item.title} mainLine={item.mainLine}  />}
             keyExtractor={item => item.id}
             numColumns={2}
             />
-            :
-            <FlatList
-            data={WrapData}
-            renderItem={({item}) => <Item image={item.image} title={item.title} mainLine={item.mainLine}  />}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            />
-            }
         </View>
     );
 };
